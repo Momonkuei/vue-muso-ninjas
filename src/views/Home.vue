@@ -18,7 +18,6 @@ export default {
 
 	setup() {
 		const { documents, error } = getCollection('playlists');
-		console.log('documents', documents);
 
 		return {
 			documents,

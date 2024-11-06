@@ -32,7 +32,6 @@ import getUser from '../composables/getUser';
 export default {
 	setup() {
 		const { user } = getUser();
-		console.log(user);
 
 		const router = useRouter();
 		const { error, logout, isPending } = useLogout();
