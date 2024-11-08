@@ -19,7 +19,22 @@
 
 			<!-- song list -->
 			<div class="song-list">
-				<p>song list here</p>
+				<div v-if="!playlist.songs.length">
+					No songs have been added to this play yet.
+				</div>
+				<div
+					v-for="song in playlist.songs"
+					:key="song.id"
+					class="single-song"
+				>
+					<div class="details">
+						<h3>{{ song.title }}</h3>
+						<p>{{ song.artist }}</p>
+					</div>
+					<button v-if="ownership" @click="handleClick(song.id)">
+						delete
+					</button>
+				</div>
 				<add-song v-if="ownership" :playlist="playlist"></add-song>
 			</div>
 		</div>
@@ -47,7 +62,7 @@ export default {
 		);
 
 		const { user } = getUser();
-		const { deleteDoc } = useDocument('playlists', props.id);
+		const { deleteDoc, updateDoc } = useDocument('playlists', props.id);
 		const { deleteImage } = useStorage();
 
 		const router = useRouter();
@@ -66,11 +81,22 @@ export default {
 			router.push({ name: 'Home' });
 		};
 
+		const handleClick = async id => {
+			const newSongs = playlist.value.songs.filter(
+				song => id !== song.id
+			);
+
+			await updateDoc({
+				songs: newSongs,
+			});
+		};
+
 		return {
 			playlist,
 			error,
 			ownership,
 			handleDelete,
+			handleClick,
 		};
 	},
 };
@@ -82,6 +108,14 @@ export default {
 	grid-template-columns: 1fr 2fr;
 	gap: 80px;
 }
+
+@media (max-width: 576px) {
+	.playlist-details {
+		grid-template-columns: 1fr;
+		gap: 40px;
+	}
+}
+
 .cover {
 	overflow: hidden;
 	border-radius: 20px;
@@ -116,5 +150,13 @@ export default {
 }
 .description {
 	text-align: left;
+}
+.single-song {
+	padding: 10px 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-bottom: 1px dashed var(--secondary);
+	margin-bottom: 20px;
 }
 </style>
